@@ -18,3 +18,12 @@
     border: none;
     border-radius: 20px;
 }
+.wrapper-grid {
+    display: flex;
+    flex-wrap: wrap;
+}
+.wrapper-list {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+}

@@ -1,20 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import Post from '../Post/Post';
 import styles from './posts.module.css'
-import axios from 'axios';
-
-const getPosts = () => {
-    return axios.get('http://localhost:3001/posts')
-}
+import postService from '../../services/posts';
 
 const Posts = (props) => {
-    // const { posts } = props
     const [posts, setPosts] = useState([])
     const [newPost, setNewPost] = useState('')
     const [showAll, setShowAll] = useState(false)
+    const [wrapper, setWrapper] = useState("wrapper-grid")
 
     useEffect(() => {
-      getPosts()
+        postService
+        .get()
       .then(res => {
         setPosts(res.data)
       })
@@ -23,34 +20,70 @@ const Posts = (props) => {
     const addPost = (event) => {
         event.preventDefault()
         const postObject = {
-            id: posts.length + 1,
             title: newPost,
             published: Math.random() > 0.5
         }
-        setPosts(posts.concat(postObject))
+        postService
+            .create(postObject)
+            .then(res => setPosts(posts.concat(res.data)))
         setNewPost('')
     }
 
-    const postsToShow = showAll ? posts : posts.filter(post => post.published)
+    const togglePublished = (id, published) => {
+
+        const editedInfo = {
+            'published' : !published
+        }
+        postService
+            .edit(id, editedInfo)
+            .then(res => {
+                setPosts(posts.map(post => post.id === id ? res.data : post))
+            })
+            .catch(err => console.log(err))
+    }
+
+    const deletePost = (id) => {
+        postService
+        .delete(id)
+        .then((res) => {
+            setPosts(posts.filter((post) => post.id !== id))
+        })
+    }
+
+    const postsToShow = showAll 
+    ? posts 
+    : posts.filter(post => post.published)
 
     // const handlePostChange = (event) => {
     //     console.log(event.target.value); то что пользователь вводит в input
     //     setNewPost(event.target.value)
     // }
 
-
     return (
         <div>
             <div>
+                <button onClick={() => setWrapper("wrapper-list")}>
+                    Список
+                </button>
+                <button onClick={() => setWrapper("wrapper-grid")}>
+                    Сетка
+                </button>
                 <button className={styles.click} onClick={() => setShowAll(!showAll)}>
                     Показать {showAll ? 'Опубликовано' : 'Все'}
                 </button>
             </div>
+            <div className={styles[wrapper]}>
             {postsToShow.map(post => {
                 return (
-                    <Post key={post.id} post={post} />
+                    <Post
+                     key={post.id} 
+                     post={post} 
+                     togglePublished={togglePublished}
+                     deletePost={deletePost}
+                    />
                 )
             })}
+            </div>
             <form onSubmit={addPost}>
                 <input className={styles.text}
                     type="text"

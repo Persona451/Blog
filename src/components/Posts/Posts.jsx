@@ -11,11 +11,11 @@ const Posts = (props) => {
 
     useEffect(() => {
         postService
-        .get()
-      .then(res => {
-        setPosts(res.data)
-      })
-    },[])
+            .get()
+            .then(res => {
+                setPosts(res.data)
+            })
+    }, [])
 
     const addPost = (event) => {
         event.preventDefault()
@@ -32,7 +32,7 @@ const Posts = (props) => {
     const togglePublished = (id, published) => {
 
         const editedInfo = {
-            'published' : !published
+            'published': !published
         }
         postService
             .edit(id, editedInfo)
@@ -44,15 +44,15 @@ const Posts = (props) => {
 
     const deletePost = (id) => {
         postService
-        .delete(id)
-        .then((res) => {
-            setPosts(posts.filter((post) => post.id !== id))
-        })
+            .delete(id)
+            .then((res) => {
+                setPosts(posts.filter((post) => post.id !== id))
+            })
     }
 
-    const postsToShow = showAll 
-    ? posts 
-    : posts.filter(post => post.published)
+    const postsToShow = showAll
+        ? posts
+        : posts.filter(post => post.published)
 
     // const handlePostChange = (event) => {
     //     console.log(event.target.value); то что пользователь вводит в input
@@ -68,21 +68,25 @@ const Posts = (props) => {
                 <button onClick={() => setWrapper("wrapper-grid")}>
                     Сетка
                 </button>
+                <button onClick={() => setWrapper("wrapper-grid_3")}>
+                    Сетка 3
+                </button>
                 <button className={styles.click} onClick={() => setShowAll(!showAll)}>
                     Показать {showAll ? 'Опубликовано' : 'Все'}
                 </button>
             </div>
             <div className={styles[wrapper]}>
-            {postsToShow.map(post => {
-                return (
-                    <Post
-                     key={post.id} 
-                     post={post} 
-                     togglePublished={togglePublished}
-                     deletePost={deletePost}
-                    />
-                )
-            })}
+                {postsToShow.map(post => {
+                    return (
+                        <Post
+                            style={{width: `${wrapper === "wrapper-grid_3" ? "30%" : "40%"}`}}
+                            key={post.id}
+                            post={post}
+                            togglePublished={togglePublished}
+                            deletePost={deletePost}
+                        />
+                    )
+                })}
             </div>
             <form onSubmit={addPost}>
                 <input className={styles.text}
